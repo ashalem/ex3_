@@ -9,7 +9,7 @@ $(EXEC) : $(OBJS)
 
 
 HealthPoints.o: HealthPoints.cpp HealthPoints.h
-Queue.o: Queue.cpp Queue.h 
+Queue.o: Queue.h 
 #main.o: main.cpp Mtmchkin.h Card.h
 
 tester : HealthPoints.o Queue.o
