@@ -1,6 +1,7 @@
 
 #include "Queue.h"
 #include "iostream"
+#include <assert.h>
 
 #define AGREGATE_TEST_RESULT(res, cond) (res) = ((res) && (cond))
 
@@ -25,17 +26,21 @@ bool testQueueMethods()
 	queue1.pushBack(2);
 	int front1 = queue1.front();
 	AGREGATE_TEST_RESULT(testResult, front1 == 1);
+    assert(front1 == 1);
 
 	queue1.front() = 3;
 	front1 = queue1.front();
 	AGREGATE_TEST_RESULT(testResult, front1 == 3);
+    assert(front1 == 3);
 
 	queue1.popFront();
 	front1 = queue1.front();
 	AGREGATE_TEST_RESULT(testResult, front1 == 2);
+    assert(front1 == 2);
 
 	int size1 = queue1.size();
 	AGREGATE_TEST_RESULT(testResult, size1 == 1);
+    assert(size1 == 1);
 
 	return testResult;
 }
