@@ -34,7 +34,7 @@ HealthPoints operator+(const int addHealth, const HealthPoints& hp1){
 }
 
 HealthPoints& HealthPoints::operator-=(const int subHealth){
-    int subtractedHealth = this->m_hp - subHealth > MINIMUM_HP ? this->m_hp + subHealth : MINIMUM_HP; 
+    int subtractedHealth = this->m_hp - subHealth > MINIMUM_HP ? this->m_hp - subHealth : MINIMUM_HP; 
     this->m_hp = subtractedHealth > this->m_maxhp ? this->m_maxhp : subtractedHealth;
 
     return *this;
