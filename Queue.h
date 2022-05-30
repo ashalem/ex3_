@@ -1,3 +1,8 @@
+#ifndef EX3_Queue_H
+#define EX3_Queue_H
+
+#include <assert.h>
+
 template<class T>
 class Queue {
 public:
@@ -50,7 +55,6 @@ Queue<T>::Node::Node(const T& val): m_val(val), m_next(nullptr) {}
 template<class T>
 class Queue<T>::Iterator {
     Queue<T>::Node *m_node;
-    friend class Queue<T>::Node; //Might not need it
 
 public:
     T& operator*() const;
@@ -93,7 +97,6 @@ Queue<T>::Iterator::Iterator(Queue<T>::Node *begin): m_node(begin) {}
 template<class T>
 class Queue<T>::ConstIterator {
     Queue<T>::Node const *m_node;
-    friend class Queue<T>::Node; //Might not need it
 
 public:
     const T& operator*() const;
@@ -146,6 +149,7 @@ Queue<T>& Queue<T>::operator=(const Queue<T>& other) {
     if (this == &other) {
         return *this;
     }
+
     clear();
     copyNodes(other);
     return *this;
@@ -234,8 +238,8 @@ void Queue<T>::clear() {
 
 template<class T>
 void Queue<T>::copyNodes(const Queue& other) {
-    for (typename Queue<T>::ConstIterator elem = other.begin(); elem != other.end(); ++elem) {
-        pushBack(*elem);
+    for (const T& elem : other) {
+        pushBack(elem);
     }
 }
 
@@ -246,10 +250,15 @@ Queue<T>::~Queue() {
 
 template<class T>
 Queue<T> filter(const Queue<T>& original, bool (*predicat)(T)) {
+    assert(predicat);
     Queue<T> filtered = Queue<T>();
-    for (typename Queue<T>::ConstIterator elem = original.begin(); elem != original.end(); ++elem) {
-        if (predicat(*elem)) {
-            filtered.pushBack(*elem);
+    if (!predicat) {
+        return filtered;
+    }
+
+    for (const T& elem : original) {
+        if (predicat(elem)) {
+            filtered.pushBack(elem);
         }
     }
 
@@ -258,7 +267,14 @@ Queue<T> filter(const Queue<T>& original, bool (*predicat)(T)) {
 
 template<class T>
 void transform(Queue<T>& queue, void (*modifier)(T&)) {
-    for (typename Queue<T>::Iterator elem = queue.begin(); elem != queue.end(); ++elem) {
-        modifier(*elem);
+    assert(modifier);
+    if (!modifier) {
+        return;
+    }
+
+    for (T& elem : queue) {
+        modifier(elem);
     }
 }
+
+#endif //EX3_Queue_H
