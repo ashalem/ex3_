@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <new>
+#include <iostream>
 
 template<class T>
 class Queue {
@@ -151,6 +152,7 @@ Queue<T>::Queue(const Queue<T>& other): m_size(0), m_head(nullptr), m_last(nullp
     }
     catch(const std::bad_alloc& e) {
         clear();
+        throw;
     }
 }
 
@@ -205,6 +207,9 @@ void Queue<T>::popFront() {
     delete this->m_head;
     this->m_head = newHead;
     this->m_size--;
+    if (this->m_size == 0) {
+        this->m_last = nullptr;
+    }
 }
 
 template<class T>
@@ -258,10 +263,10 @@ Queue<T>::~Queue() {
     clear();
 }
 
-template<class T>
-Queue<T> filter(const Queue<T>& original, bool (*predicat)(T)) {
+template<class T, class PredictFunc>
+Queue<T> filter(const Queue<T>& original, PredictFunc predicat) {
     assert(predicat);
-    Queue<T> filtered = Queue<T>();
+    Queue<T> filtered;
     if (!predicat) {
         return filtered;
     }
@@ -275,8 +280,8 @@ Queue<T> filter(const Queue<T>& original, bool (*predicat)(T)) {
     return filtered;
 }
 
-template<class T>
-void transform(Queue<T>& queue, void (*modifier)(T&)) {
+template<class T, class ModifyFunc>
+void transform(Queue<T>& queue, ModifyFunc modifier) {
     assert(modifier);
     if (!modifier) {
         return;
