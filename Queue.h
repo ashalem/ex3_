@@ -2,6 +2,7 @@
 #define EX3_Queue_H
 
 #include <assert.h>
+#include <new>
 
 template<class T>
 class Queue {
@@ -25,12 +26,12 @@ public:
     ConstIterator begin() const;
     ConstIterator end() const;
 
-    class Node;
     class EmptyQueue {};
 
 private:
     void clear();
     void copyNodes(const Queue& other);
+    class Node;
 
     int m_size;
     Node *m_head;
@@ -44,7 +45,9 @@ public:
     Node(const Node&) = default; // Maybe won't need it
     ~Node() = default;
     Node& operator=(const Node& other) = default;
+    friend class Queue<T>;
 
+private:
     T m_val;
     Node *m_next;
 };
@@ -55,12 +58,13 @@ Queue<T>::Node::Node(const T& val): m_val(val), m_next(nullptr) {}
 template<class T>
 class Queue<T>::Iterator {
     Queue<T>::Node *m_node;
+    Iterator(Queue<T>::Node *begin);
+    friend class Queue<T>;
 
 public:
     T& operator*() const;
     Iterator& operator++();
     bool operator!=(const Iterator& other) const;
-    Iterator(Queue<T>::Node *begin);
     Iterator(const Queue<T>::Iterator& other) = default;
     Iterator& operator=(const Queue<T>::Iterator& other) = default;
     ~Iterator() = default;
@@ -97,12 +101,13 @@ Queue<T>::Iterator::Iterator(Queue<T>::Node *begin): m_node(begin) {}
 template<class T>
 class Queue<T>::ConstIterator {
     Queue<T>::Node const *m_node;
+    ConstIterator(Queue<T>::Node const *begin);
+    friend class Queue<T>;
 
 public:
     const T& operator*() const;
     ConstIterator& operator++();
     bool operator!=(const ConstIterator& other) const;
-    ConstIterator(Queue<T>::Node const *begin);
     ConstIterator(const Queue<T>::ConstIterator& other) = default;
     ConstIterator& operator=(const Queue<T>::ConstIterator& other) = default;
     ~ConstIterator() = default;
@@ -141,7 +146,12 @@ Queue<T>::Queue(): m_size(0), m_head(nullptr), m_last(nullptr) {}
 
 template<class T>
 Queue<T>::Queue(const Queue<T>& other): m_size(0), m_head(nullptr), m_last(nullptr) {
-    copyNodes(other);
+    try {
+        copyNodes(other);
+    }
+    catch(const std::bad_alloc& e) {
+        clear();
+    }
 }
 
 template<class T>
