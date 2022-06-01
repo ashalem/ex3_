@@ -1,5 +1,5 @@
 CC=g++
-OBJS=HealthPoints.o Queue.o main.o
+OBJS=HealthPoints.o HealthPointsExampleTest.o QueueExampleTests.o TestMain.o
 EXEC=ex3_test
 DEBUG_FLAG= -g
 CPPFLAGS=--std=c++11 -Wall -pedantic-errors -Werror -DNDEBUG -g
@@ -7,12 +7,10 @@ CPPFLAGS=--std=c++11 -Wall -pedantic-errors -Werror -DNDEBUG -g
 $(EXEC) : $(OBJS)
 	$(CC) $(DEBUG_FLAG) $(CPPFLAGS) $(OBJS) -o $@
 
-
 HealthPoints.o: HealthPoints.cpp HealthPoints.h
-Queue.o: Queue.h 
-
-tester : HealthPoints.o Queue.o
-	$(CC) $(DEBUG_FLAG) $(CPPFLAGS) HealthPoints.o Queue.o -o $@
+HealthPointsExampleTest.o: HealthPointsExampleTest.cpp HealthPoints.h
+QueueExampleTests.o: QueueExampleTests.cpp Queue.h
+TestMain.o: TestMain.cpp
 
 clean:
 	rm -f $(OBJS) $(EXEC)
