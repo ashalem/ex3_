@@ -31,12 +31,18 @@ public:
 
 private:
     void clear();
+    void clearStash();
+    void stash();
+    void applyStash();
     void copyNodes(const Queue& other);
     class Node;
 
     int m_size;
     Node *m_head;
     Node *m_last;
+    int m_stashedSize;
+    Node *m_stashedHead;
+    Node *m_stashedLast;
 };
 
 template<class T>
@@ -143,10 +149,12 @@ Queue<T>::ConstIterator::ConstIterator(Queue<T>::Node const *begin): m_node(begi
 
 
 template<class T>
-Queue<T>::Queue(): m_size(0), m_head(nullptr), m_last(nullptr) {}
+Queue<T>::Queue(): m_size(0), m_head(nullptr), m_last(nullptr), 
+    m_stashedSize(0), m_stashedHead(nullptr),  m_stashedLast(nullptr) {}
 
 template<class T>
-Queue<T>::Queue(const Queue<T>& other): m_size(0), m_head(nullptr), m_last(nullptr) {
+Queue<T>::Queue(const Queue<T>& other): m_size(0), m_head(nullptr), m_last(nullptr),
+    m_stashedSize(0), m_stashedHead(nullptr),  m_stashedLast(nullptr) {
     try {
         copyNodes(other);
     }
@@ -162,23 +170,16 @@ Queue<T>& Queue<T>::operator=(const Queue<T>& other) {
         return *this;
     }
 
-    Node *oldNodesHead = this->m_head;
-    Node *oldNodesLast = this->m_last;
-    int oldSize = this->m_size;
-    this->m_head = nullptr;
-    this->m_last = nullptr;
-    this->m_size = 0;
-
+    stash();
     try {
         copyNodes(other);
     } catch(const std::bad_alloc& e) {
-        clear();
-        this->m_head = oldNodesHead;
-        this->m_last = oldNodesLast;
-        this->m_size = oldSize;
+        applyStash();
         throw;
     }
-    
+
+    // Successfully copied new nodes
+    clearStash();
     return *this;
 }
 
@@ -253,13 +254,48 @@ typename Queue<T>::ConstIterator Queue<T>::end() const {
 }
 
 template<class T>
+void Queue<T>::clearStash() {
+    Node *next = nullptr;
+    while (this->m_stashedHead) {
+        next = this->m_stashedHead->m_next;
+        delete this->m_stashedHead;
+        this->m_stashedHead = next;
+    }
+    this->m_stashedHead = nullptr;
+    this->m_stashedLast = nullptr;
+    this->m_stashedSize = 0;
+}
+
+template<class T>
+void Queue<T>::stash() {
+    clearStash();
+    this->m_stashedHead = this->m_head;
+    this->m_stashedLast = this->m_last;
+    this->m_stashedSize = this->m_size;
+    this->m_head = nullptr;
+    this->m_last = nullptr;
+    this->m_size = 0;
+}
+
+template<class T>
+void Queue<T>::applyStash() {
+    clear();
+    this->m_head = this->m_stashedHead;
+    this->m_last = this->m_stashedLast;
+    this->m_size = this->m_stashedSize;
+    this->m_stashedHead = nullptr;
+    this->m_stashedLast = nullptr;
+    this->m_stashedSize = 0;
+}
+
+template<class T>
 void Queue<T>::clear() {
     Node *next = nullptr;
     while (nullptr != this->m_head) {
         next = this->m_head->m_next;
-        delete m_head;
-        m_size--;
-        m_head = next;
+        delete this->m_head;
+        this->m_size--;
+        this->m_head = next;
     }
 
     // Finished clear, meaning now m_last points to a deleted node
