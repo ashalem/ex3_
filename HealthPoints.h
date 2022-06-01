@@ -1,7 +1,3 @@
-//
-// Created by Eden_Strugo on 29/05/2022.
-//
-
 #ifndef EX3_HealthPoints_H
 #define EX3_HealthPoints_H
 #include <iostream>

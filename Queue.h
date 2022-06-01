@@ -162,8 +162,23 @@ Queue<T>& Queue<T>::operator=(const Queue<T>& other) {
         return *this;
     }
 
-    clear();
-    copyNodes(other);
+    Node *oldNodesHead = this->m_head;
+    Node *oldNodesLast = this->m_last;
+    int oldSize = this->m_size;
+    this->m_head = nullptr;
+    this->m_last = nullptr;
+    this->m_size = 0;
+
+    try {
+        copyNodes(other);
+    } catch(const std::bad_alloc& e) {
+        clear();
+        this->m_head = oldNodesHead;
+        this->m_last = oldNodesLast;
+        this->m_size = oldSize;
+        throw;
+    }
+    
     return *this;
 }
 
