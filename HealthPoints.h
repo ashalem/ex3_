@@ -11,7 +11,6 @@ using std::endl;
 
 
 #define DEFAULT_MAX_HP (100)
-#define MINIMUM_HP (0)
 
 class HealthPoints {
 public:
@@ -88,6 +87,9 @@ public:
      
 
 private:
+
+    int getInBounds(const int changedHealth);
+    
     int m_maxhp;
     int m_hp;
 };

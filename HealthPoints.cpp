@@ -9,16 +9,30 @@ HealthPoints::InvalidArgument::InvalidArgument(int invalidHealth): m_invalidHeal
 
 HealthPoints::HealthPoints(const int maxHp): m_maxhp(maxHp), m_hp(maxHp)
  {
-     if(maxHp <= MINIMUM_HP){
+     if(maxHp <= 0){
          throw InvalidArgument(maxHp);
      }
 }
 
 //######################arithmetic operators######################//
 
+
+int HealthPoints::getInBounds(const int changedHealth){
+
+    if (changedHealth >= this->m_maxhp){
+        return this->m_maxhp;
+    }
+    
+    if (changedHealth <= 0){
+        return 0;
+    }
+    
+    return changedHealth;
+}
+  
 HealthPoints& HealthPoints::operator+=(const int addHealth){
-    int addedHealth = this->m_hp + addHealth > MINIMUM_HP ? this->m_hp + addHealth : MINIMUM_HP; 
-    this->m_hp = addedHealth > this->m_maxhp ? this->m_maxhp : addedHealth;
+    int addedHealth = this->m_hp + addHealth; 
+    this->m_hp = this->getInBounds(addedHealth);
 
     return *this;
 }
@@ -34,8 +48,8 @@ HealthPoints operator+(const int addHealth, const HealthPoints& hp1){
 }
 
 HealthPoints& HealthPoints::operator-=(const int subHealth){
-    int subtractedHealth = this->m_hp - subHealth > MINIMUM_HP ? this->m_hp - subHealth : MINIMUM_HP; 
-    this->m_hp = subtractedHealth > this->m_maxhp ? this->m_maxhp : subtractedHealth;
+    int subtractedHealth = this->m_hp - subHealth;
+    this->m_hp = this->getInBounds(subtractedHealth);
 
     return *this;
 }
